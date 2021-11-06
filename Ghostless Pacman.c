@@ -168,7 +168,7 @@ void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y]) {
 }
 
 void renderPlayer(SDL_Renderer *rend, int playerX, int playerY) {
-  SDL_Texture* player = IMG_LoadTexture(rend, "icon.png");
+  SDL_Texture* player = IMG_LoadTexture(rend, "player.png");
 	SDL_Rect texr;
   texr.x = WIDTH/(MAP_X+2)+(WIDTH/(MAP_X+2))*playerX;
   texr.y = HEIGHT/(MAP_Y+2)+(HEIGHT/(MAP_Y+2))*playerY;
