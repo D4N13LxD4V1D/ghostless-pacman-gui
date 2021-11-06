@@ -5,14 +5,15 @@
 #include <SDL2/SDL_image.h>
 
 // Map Settings
-#define MAP_X 30
-#define MAP_Y 30
-#define BLOCKS 10
+#define MAP_X 15
+#define MAP_Y 15
+#define BLOCKS_FREQUENCY 0.20
+#define BLOCKS (int) ((MAP_X * MAP_Y) * (BLOCKS_FREQUENCY))
 
 // Windows Settings
-#define SCALE 1
-#define WIDTH MAP_X * SCALE * (MAP_X + 2)
-#define HEIGHT MAP_Y * SCALE * (MAP_Y + 2)
+#define SCALE 4
+#define WIDTH (MAP_X * SCALE * (MAP_X + 2))
+#define HEIGHT (MAP_Y * SCALE * (MAP_Y + 2))
 #define FPS 60
 
 // Block IDs
@@ -48,7 +49,9 @@ void generateBlocks(int map[MAP_X][MAP_Y], int numOfBlocks) {
 		x = rand() % MAP_X;
 		y = rand() % MAP_Y;
 
-		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
+		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0) &&
+        (map[(x + 1 ) % MAP_X][y] == PATH || map[x][(y + 1) % MAP_Y] == PATH || map[(x - 1) % MAP_X][y] == PATH || map[x][(y - 1) % MAP_Y] == PATH)
+    ) {
 			map[x][y] = BLOCK;
 			numOfBlocks--;
 		}
@@ -62,7 +65,9 @@ void generateFoods(int map[MAP_X][MAP_Y], int numOfFoods) {
 		x = rand() % MAP_X;
 		y = rand() % MAP_Y;
 
-		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
+		if (map[x][y] == PATH &&
+        !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)
+        ) {
 			map[x][y] = FOOD;
 			numOfFoods--;
 		}
@@ -76,7 +81,10 @@ void generateExit(int map[MAP_X][MAP_Y]) {
 		x = rand() % MAP_X;
 		y = rand() % MAP_Y;
 
-		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
+		if (map[x][y] == PATH &&
+        !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0) &&
+        (map[(x + 1 ) % MAP_X][y] == PATH || map[x][(y + 1) % MAP_Y] == PATH || map[(x - 1) % MAP_X][y] == PATH || map[x][(y - 1) % MAP_Y] == PATH)
+      ) {
 			map[x][y] = EXIT;
 			break;
 		}
@@ -227,16 +235,16 @@ int startGame(int numOfFoods) {
 	int playerX = 0, playerY = 0;
 
 	fillPath(map);
-	generateBlocks(map, BLOCKS);
 	generateFoods(map, numOfFoods);
 	generateExit(map);
-
+	generateBlocks(map, BLOCKS);
 
   while (gameState == GAME_PLAYING) {
     /* Check game state */
     gameState = checkGameStatus(map, playerX, playerY, &remainingFood);
-    map[playerX][playerY] = AIR;
-    
+    if (!(map[playerX][playerY] == EXIT))
+      map[playerX][playerY] = AIR;
+
     /* Process keyboard events */
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
