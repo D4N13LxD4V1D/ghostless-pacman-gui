@@ -13,12 +13,12 @@
 #define BLOCKS 10
 
 // Block IDs
-#define AIR -1
-#define PATH -1
-#define BLOCK 1
-#define FOOD 2
-#define EXIT 3
-#define PLAYER 4
+#define AIR 0
+#define PATH 1
+#define BLOCK 2
+#define FOOD 3
+#define EXIT 4
+#define PLAYER 5
 
 // Game States
 #define GAME_STOPPED -2
@@ -28,10 +28,14 @@
 #define GAME_WON 2
 
 
-void fillAir(int map[MAP_X][MAP_Y]) {
-	for (int y = 0; y < MAP_Y; y++)
-		for (int x = 0; x < MAP_X; x++)
-			map[x][y] = AIR;
+void fillPath(int map[MAP_X][MAP_Y]) {
+	for (int y = 0; y < MAP_Y; y++) {
+		for (int x = 0; x < MAP_X; x++) {
+      if (x==0 && y==0)
+        continue;
+			map[x][y] = PATH;
+    }
+  }
 }
 
 void generateBlocks(int map[MAP_X][MAP_Y], int numOfBlocks) {
@@ -41,7 +45,7 @@ void generateBlocks(int map[MAP_X][MAP_Y], int numOfBlocks) {
 		x = rand() % MAP_X;
 		y = rand() % MAP_Y;
 
-		if (map[x][y] == AIR && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
+		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
 			map[x][y] = BLOCK;
 			numOfBlocks--;
 		}
@@ -55,7 +59,7 @@ void generateFoods(int map[MAP_X][MAP_Y], int numOfFoods) {
 		x = rand() % MAP_X;
 		y = rand() % MAP_Y;
 
-		if (map[x][y] && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
+		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
 			map[x][y] = FOOD;
 			numOfFoods--;
 		}
@@ -70,7 +74,7 @@ void generateExit(int map[MAP_X][MAP_Y]) {
 		x = rand() % MAP_X;
 		y = rand() % MAP_Y;
 
-		if (map[x][y] == AIR && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
+		if (map[x][y] == PATH && !(x == 0 && y == 0) && !(x == 0 && y == 1) && !(x == 1 && y == 0)) {
 			map[x][y] = EXIT;
 			numberOfExits--;
 		}
@@ -78,15 +82,23 @@ void generateExit(int map[MAP_X][MAP_Y]) {
 }
 
 
-void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y]) {
+void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y], int playerX, int playerY) {
+  SDL_Texture* player = IMG_LoadTexture(rend, "icon.png");
+	SDL_Rect texr;
+  texr.x = WIDTH/MAP_X+(WIDTH/MAP_X)*playerX;
+  texr.y = HEIGHT/MAP_Y+(HEIGHT/MAP_X)*playerY;
+  texr.w = WIDTH/MAP_X;
+  texr.h = HEIGHT/MAP_Y;
+  SDL_RenderCopy(rend, player, NULL, &texr);
+
   SDL_Rect mapBlocks[MAP_X][MAP_Y];
 
 	for (int y = 0; y < MAP_Y; y++) {
 		for (int x = 0; x < MAP_X; x++) {
-      mapBlocks[x][y].x = WIDTH/12+(WIDTH/12)*x;
-      mapBlocks[x][y].y = HEIGHT/12+(HEIGHT/12)*y;
-      mapBlocks[x][y].w = WIDTH/12;
-      mapBlocks[x][y].h = HEIGHT/12;
+      mapBlocks[x][y].x = WIDTH/MAP_X+(WIDTH/MAP_X)*x;
+      mapBlocks[x][y].y = HEIGHT/MAP_Y+(HEIGHT/MAP_X)*y;
+      mapBlocks[x][y].w = WIDTH/MAP_X;
+      mapBlocks[x][y].h = HEIGHT/MAP_Y;
 
       switch (map[x][y]) {
         case PATH:
@@ -117,18 +129,18 @@ void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y]) {
   
   for (int x = 0; x < MAP_X+2; x++) {
     SDL_Rect border;
-    border.x = (WIDTH/12)*x;
+    border.x = (WIDTH/MAP_X)*x;
     border.y = 0;
-    border.w = WIDTH/12;
-    border.h = HEIGHT/12;
+    border.w = WIDTH/MAP_X;
+    border.h = HEIGHT/MAP_X;
 
     SDL_SetRenderDrawColor(rend, 86,86,255,255);
     SDL_RenderFillRect(rend, &border);
 
-    border.x = (WIDTH/12)*x;
-    border.y = HEIGHT - HEIGHT/12;
-    border.w = WIDTH/12;
-    border.h = HEIGHT/12;
+    border.x = (WIDTH/MAP_X)*x;
+    border.y = HEIGHT - HEIGHT/MAP_X;
+    border.w = WIDTH/MAP_X;
+    border.h = HEIGHT/MAP_X;
 
     SDL_SetRenderDrawColor(rend, 86,86,255,255);
     SDL_RenderFillRect(rend, &border);
@@ -136,21 +148,23 @@ void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y]) {
   for (int y = 0; y < MAP_Y + 2; y++) {
     SDL_Rect border;
     border.x = 0;
-    border.y = (HEIGHT/12)*y;
-    border.w = WIDTH/12;
-    border.h = HEIGHT/12;
+    border.y = (HEIGHT/MAP_X)*y;
+    border.w = WIDTH/MAP_X;
+    border.h = HEIGHT/MAP_X;
 
     SDL_SetRenderDrawColor(rend, 86,86,255,255);
     SDL_RenderFillRect(rend, &border);border;
 
-    border.x = WIDTH - WIDTH/12;
-    border.y = (HEIGHT/12)*y;
-    border.w = WIDTH/12;
-    border.h = HEIGHT/12;
+    border.x = WIDTH - WIDTH/MAP_X;
+    border.y = (HEIGHT/MAP_X)*y;
+    border.w = WIDTH/MAP_X;
+    border.h = HEIGHT/MAP_X;
 
     SDL_SetRenderDrawColor(rend, 86,86,255,255);
     SDL_RenderFillRect(rend, &border);
   }
+
+  SDL_DestroyTexture(player);
 }
 
 
@@ -204,7 +218,7 @@ int main(int argc, char* argv[])
 	int gameState = GAME_PLAYING;
 	int playerX = 0, playerY = 0;
 
-	fillAir(map);
+	fillPath(map);
 	generateBlocks(map, BLOCKS);
 	generateFoods(map, numOfFoods);
 	generateExit(map);
@@ -222,28 +236,21 @@ int main(int argc, char* argv[])
         case SDL_KEYDOWN:
           switch (event.key.keysym.scancode)
           {
+            case SDL_SCANCODE_W:
+            case SDL_SCANCODE_UP:
+              playerY -= 1;
+              break;
+            case SDL_SCANCODE_S:
+            case SDL_SCANCODE_DOWN:
+              playerY += 1;
+              break;
             case SDL_SCANCODE_A:
             case SDL_SCANCODE_LEFT:
-              left_pressed = true;
+              playerX -= 1;
               break;
             case SDL_SCANCODE_D:
             case SDL_SCANCODE_RIGHT:
-              right_pressed = true;
-              break;
-            default:
-              break;
-            }
-          break;
-        case SDL_KEYUP:
-          switch (event.key.keysym.scancode)
-          {
-            case SDL_SCANCODE_A:
-            case SDL_SCANCODE_LEFT:
-              left_pressed = false;
-              break;
-            case SDL_SCANCODE_D:
-            case SDL_SCANCODE_RIGHT:
-              right_pressed = false;
+              playerX += 1;
               break;
             default:
               break;
@@ -261,7 +268,7 @@ int main(int argc, char* argv[])
     /* Move the player */
     
     /* Draw the map */
-    renderMap(rend, map);
+    renderMap(rend, map, playerX, playerY);
 
     /* Draw the player */
 
