@@ -1,2 +1,2 @@
-# gp-gui
- Pacman without the ghosts!
+# Ghostless Pacman
+Pacman without the ghosts!
