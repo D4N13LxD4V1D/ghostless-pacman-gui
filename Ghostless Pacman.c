@@ -3,14 +3,17 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#define WIDTH 720
-#define HEIGHT 720
-#define FPS 60
 
 // Map Settings
-#define MAP_X 10
-#define MAP_Y 10
+#define MAP_X 30
+#define MAP_Y 30
 #define BLOCKS 10
+
+// Windows Settings
+#define SCALE 1
+#define WIDTH MAP_X * SCALE * (MAP_X + 2)
+#define HEIGHT MAP_Y * SCALE * (MAP_Y + 2)
+#define FPS 60
 
 // Block IDs
 #define AIR 0
@@ -139,12 +142,12 @@ void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y]) {
   for (int y = 0; y < MAP_Y + 2; y++) {
     SDL_Rect border;
     border.x = 0;
-    border.y = (HEIGHT/(MAP_X+2))*y;
+    border.y = (HEIGHT/(MAP_Y+2))*y;
     border.w = WIDTH/(MAP_X+2);
     border.h = HEIGHT/(MAP_Y+2);
 
     SDL_SetRenderDrawColor(rend, 86,86,255,255);
-    SDL_RenderFillRect(rend, &border);border;
+    SDL_RenderFillRect(rend, &border);
 
     border.x = WIDTH - WIDTH/(MAP_X+2);
     border.y = (HEIGHT/(MAP_Y+2))*y;
@@ -163,8 +166,6 @@ void renderPlayer(SDL_Renderer *rend, int playerX, int playerY) {
   texr.y = HEIGHT/(MAP_Y+2)+(HEIGHT/(MAP_Y+2))*playerY;
   texr.w = WIDTH/(MAP_X+2);
   texr.h = HEIGHT/(MAP_Y+2);
-  //SDL_SetRenderDrawColor(rend, 0,0,0,255);
-  //SDL_RenderFillRect(rend, &texr);
   SDL_RenderCopy(rend, player, NULL, &texr);
   SDL_DestroyTexture(player);
 }
@@ -187,15 +188,7 @@ int checkGameStatus(int map[MAP_X][MAP_Y], int playerPositionX, int playerPositi
 	}
 }
 
-int main(int argc, char* argv[])
-{
-  /* Initialize SDL */
-  if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-  {
-    printf("Error initializing SDL: %s\n", SDL_GetError());
-    return 0;
-  }
-
+int startGame(int numOfFoods) {
   /* Create a window */
   SDL_Window* wind = SDL_CreateWindow("Ghostless Pacman",
                                       SDL_WINDOWPOS_CENTERED,
@@ -225,8 +218,6 @@ int main(int argc, char* argv[])
 
   /* Main game loop */
   SDL_Event event;
-
-  int numOfFoods = 2;
 
 	srand(SDL_GetTicks());
 
@@ -302,5 +293,18 @@ int main(int argc, char* argv[])
   SDL_DestroyRenderer(rend);
   SDL_DestroyWindow(wind);
   SDL_Quit();
+
+  return gameState;
+}
+
+int main(int argc, char* argv[])
+{
+  /* Initialize SDL */
+  if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+  {
+    printf("Error initializing SDL: %s\n", SDL_GetError());
+    return 0;
+  }
+  printf("%d",startGame(9));
   return 0;
 }
