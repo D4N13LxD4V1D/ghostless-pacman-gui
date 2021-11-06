@@ -103,7 +103,7 @@ void renderMap(SDL_Renderer *rend, int map[MAP_X][MAP_Y]) {
           break;
         case BLOCK:
           SDL_SetRenderDrawColor(rend, 86,86,255,255);
-          SDL_RenderDrawRect(rend, &mapBlocks[x][y]);
+          SDL_RenderFillRect(rend, &mapBlocks[x][y]);
           break;
         case EXIT:
           SDL_SetRenderDrawColor(rend, 255,171,255,255);
