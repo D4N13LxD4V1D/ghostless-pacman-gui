@@ -11,7 +11,7 @@
 #define BLOCKS (int) ((MAP_X * MAP_Y) * (BLOCKS_FREQUENCY))
 
 // Windows Settings
-#define SCALE 4
+#define SCALE 2
 #define WIDTH (MAP_X * SCALE * (MAP_X + 2))
 #define HEIGHT (MAP_Y * SCALE * (MAP_Y + 2))
 #define FPS 60
