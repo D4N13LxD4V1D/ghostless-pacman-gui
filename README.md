@@ -20,6 +20,6 @@ gcc -std=c17 "Ghostless Pacman.c" -ISDL2\include -LD:SDL2\lib -Wall -lmingw32 -l
 ``` 
 
 ## Gameplay
--- TODO --
+// TODO
 
 ![General Gameplay](https://i.imgur.com/P3cHgEa.gif)
