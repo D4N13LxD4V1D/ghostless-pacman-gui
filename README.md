@@ -12,7 +12,7 @@ You Need to have **MinGW** installed and properly set-up to be able to build and
 #### Instructions
 To build and run the code from source, follow the following steps:
 1. Download the source of the game by cloning this repository or by downloading it as ZIP file and extracting it to your preffered directory.
-2. Head inside the cloned/extracted folder and run **run.bat**. The batch file will execute the following commands inside the directory:
+2. Head inside the cloned/extracted folder and run **"run.bat"**. The batch file will execute the following commands inside the directory:
 ```batch
 gcc -std=c17 "Ghostless Pacman.c" -ISDL2\include -LD:SDL2\lib -Wall -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o "Ghostless Pacman" my.res -mwindows
 
